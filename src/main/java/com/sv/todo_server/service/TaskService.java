@@ -3,12 +3,15 @@ package com.sv.todo_server.service;
 import com.sv.todo_server.model.Task;
 import com.sv.todo_server.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+
 public class TaskService {
 
     @Autowired
@@ -16,6 +19,14 @@ public class TaskService {
 
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
+    }
+
+    public Page<Task> getPaginatedTasks(Pageable pageable) {
+        return taskRepository.findAll(pageable);
+    }
+
+    public Page<Task> getTasksByStatus(boolean completed, Pageable pageable) {
+        return taskRepository.findByCompleted(completed, pageable);
     }
 
     public Optional<Task> getTaskById(Long id) {
@@ -54,7 +65,7 @@ public class TaskService {
             task.setCompleted(newStatus);
             taskRepository.save(task);
         });
-    };
+    }
 
     public void removeAllCompletedTasks () {
         List<Task> completedTasks = taskRepository.findByCompletedTrue();
