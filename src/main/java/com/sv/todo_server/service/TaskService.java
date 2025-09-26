@@ -1,5 +1,6 @@
 package com.sv.todo_server.service;
 
+import com.sv.todo_server.exception.*;
 import com.sv.todo_server.model.Task;
 import com.sv.todo_server.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +48,10 @@ public class TaskService {
         });
     }
 
-    public boolean deleteTask(Long id) {
-       if (taskRepository.existsById(id)) {
-           taskRepository.deleteById(id);
-           return true;
-       }
-       return false;
+    public void deleteTask(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
+        taskRepository.delete(task);
     }
 
     public void toggleAllStatuses() {

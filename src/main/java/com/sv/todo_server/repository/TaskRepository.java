@@ -12,7 +12,7 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findByCompletedTrue();
-    Page<Task> findAll(Pageable pageable);
+    Page<Task> findAll(Pageable pageable); // этр же можно и удалить?
     Page<Task> findByCompleted(boolean completed, Pageable pageable);
 
 }

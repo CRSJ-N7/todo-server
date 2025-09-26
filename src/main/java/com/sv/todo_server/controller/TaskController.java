@@ -1,5 +1,6 @@
 package com.sv.todo_server.controller;
 
+import com.sv.todo_server.exception.TaskNotFoundException;
 import com.sv.todo_server.model.Task;
 import com.sv.todo_server.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +21,15 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-//    @GetMapping
-//    public ResponseEntity<List<Task>> getAllTasks() {
-//        try {
-//            List<Task> tasks = taskService.getAllTasks();
-//            return ResponseEntity.ok(tasks);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
+    @GetMapping("all")
+    public ResponseEntity<List<Task>> getAllTasks() {
+        try {
+            List<Task> tasks = taskService.getAllTasks();
+            return ResponseEntity.ok(tasks);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @GetMapping
     public ResponseEntity<Page<Task>> getPaginatedTasks(
@@ -75,9 +76,12 @@ public class TaskController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        boolean wasDeleted = taskService.deleteTask(id);
-        return wasDeleted ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        try {
+            taskService.deleteTask(id); // Теперь void метод
+            return ResponseEntity.noContent().build(); // 204 No Content
+        } catch (TaskNotFoundException e) {
+            return ResponseEntity.notFound().build(); // 404 Not Found
+        }
     }
 
     @PatchMapping("/toggle-statuses")
