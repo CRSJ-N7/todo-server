@@ -1,8 +1,11 @@
 package com.sv.todo_server.controller;
 
+import com.sv.todo_server.dto.request.CreateTaskRequest;
+import com.sv.todo_server.dto.request.UpdateTaskRequest;
 import com.sv.todo_server.exception.TaskNotFoundException;
 import com.sv.todo_server.model.Task;
 import com.sv.todo_server.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -58,9 +61,9 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+    public ResponseEntity<Task> createTask(@Valid @RequestBody CreateTaskRequest request) {
         try {
-            Task createdTask = taskService.createTask(task);
+            Task createdTask = taskService.createTask(request); // Сервис возвращает Task
             return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -68,8 +71,8 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task taskDetails) {
-        Optional<Task> updatedTask = taskService.updateTask(id, taskDetails);
+    public ResponseEntity<Task> updateTask(@PathVariable Long id, @Valid @RequestBody UpdateTaskRequest taskDetails) {
+        Optional<Task> updatedTask = taskService.updateTask(id, taskDetails); // Сервис возвращает Task
         return updatedTask.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

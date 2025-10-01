@@ -1,5 +1,7 @@
 package com.sv.todo_server.service;
 
+import com.sv.todo_server.dto.request.CreateTaskRequest;
+import com.sv.todo_server.dto.request.UpdateTaskRequest;
 import com.sv.todo_server.exception.*;
 import com.sv.todo_server.model.Task;
 import com.sv.todo_server.repository.TaskRepository;
@@ -8,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,16 +37,24 @@ public class TaskService {
         return taskRepository.findById(id);
     }
 
-    public Task createTask(Task task) {
+    public Task createTask(CreateTaskRequest request) {
+        Task task = new Task();
+        task.setTitle(request.getTitle());
+        task.setCompleted(false);
+        task.setCreatedAt(LocalDateTime.now());
+
         return taskRepository.save(task);
     }
 
-    public Optional<Task> updateTask(Long id, Task taskDetails) {
+    public Optional<Task> updateTask(Long id, UpdateTaskRequest taskDetails) {
         return getTaskById(id).map(existingTask -> {
+
             if (taskDetails.getTitle() != null) {
                 existingTask.setTitle(taskDetails.getTitle());
             }
-            existingTask.setCompleted(taskDetails.isCompleted());
+            if (taskDetails.getCompleted() != null) {
+                existingTask.setCompleted(taskDetails.getCompleted());
+            }
             return taskRepository.save(existingTask);
         });
     }
