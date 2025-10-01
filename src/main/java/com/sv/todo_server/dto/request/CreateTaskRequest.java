@@ -6,7 +6,8 @@ import lombok.Data;
 
 @Data
 public class CreateTaskRequest {
+
     @NotBlank
-    @Size(min = 1, max = 255, message = "Title can't be longer than 255 chars")
+    @Size(min = 1, max = 255, message = "Title can't be longer than 255 chars") // что-то ещё мб
     private String title;
 }

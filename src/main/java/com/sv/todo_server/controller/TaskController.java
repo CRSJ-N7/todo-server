@@ -63,7 +63,7 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<Task> createTask(@Valid @RequestBody CreateTaskRequest request) {
         try {
-            Task createdTask = taskService.createTask(request); // Сервис возвращает Task
+            Task createdTask = taskService.createTask(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -72,15 +72,15 @@ public class TaskController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable Long id, @Valid @RequestBody UpdateTaskRequest taskDetails) {
-        Optional<Task> updatedTask = taskService.updateTask(id, taskDetails); // Сервис возвращает Task
+        Optional<Task> updatedTask = taskService.updateTask(id, taskDetails);
         return updatedTask.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        try {
-            taskService.deleteTask(id); // Теперь void метод
+        try { // а надо ли try catch если я в сервисе делаю throws
+            taskService.deleteTask(id);
             return ResponseEntity.noContent().build(); // 204 No Content
         } catch (TaskNotFoundException e) {
             return ResponseEntity.notFound().build(); // 404 Not Found
