@@ -20,13 +20,14 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "title", nullable = false)
     @NotEmpty(message = "Title cannot be empty")
     private String title;
 
+    @Column(name = "completed")
     private boolean completed;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 

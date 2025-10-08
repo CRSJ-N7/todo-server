@@ -1,40 +1,38 @@
 package com.sv.todo_server.service;
 
 import com.sv.todo_server.dto.request.CreateTaskRequest;
-import com.sv.todo_server.dto.request.UpdateTaskRequest;
+import com.sv.todo_server.dto.request.UpdateStatusRequest;
+import com.sv.todo_server.dto.request.UpdateTitleRequest;
 import com.sv.todo_server.exception.*;
 import com.sv.todo_server.model.Task;
 import com.sv.todo_server.repository.TaskRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-
+@RequiredArgsConstructor
 public class TaskService {
 
-    @Autowired
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
 
-    public Page<Task> getPaginatedTasks(Pageable pageable) {
-        return taskRepository.findAll(pageable);
+    public Page<Task> getPaginatedTasks(Boolean completed, Pageable pageable) { // блять да почему Boolean с большой буквы
+        if (completed == null) {
+            return taskRepository.findAll(pageable);
+        } else {
+            return taskRepository.findByCompleted(completed, pageable);
+        }
     }
 
-    public Page<Task> getTasksByStatus(boolean completed, Pageable pageable) {
-        return taskRepository.findByCompleted(completed, pageable);
-    }
-
-    public Optional<Task> getTaskById(Long id) {
-        return taskRepository.findById(id);
+    public Task getTaskById(Long id) {
+        return taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
     }
 
     public Task createTask(CreateTaskRequest request) {
@@ -46,18 +44,18 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public Optional<Task> updateTask(Long id, UpdateTaskRequest taskDetails) {
-        return getTaskById(id).map(existingTask -> {
 
-            if (taskDetails.getTitle() != null) {
-                existingTask.setTitle(taskDetails.getTitle());
-            }
-            if (taskDetails.getCompleted() != null) {
-                existingTask.setCompleted(taskDetails.getCompleted());
-            }
-            return taskRepository.save(existingTask);
-        });
-    }
+    public Task updateStatus(Long id, UpdateStatusRequest request) {
+       Task task = taskRepository.findById(id).orElseThrow(()-> new TaskNotFoundException(id));
+       task.setCompleted(request.isCompleted());
+       return taskRepository.save(task);
+    };
+
+    public Task updateTitle(Long id, UpdateTitleRequest request) {
+        Task task = taskRepository.findById(id).orElseThrow(()-> new TaskNotFoundException(id));
+        task.setTitle(request.getTitle());
+        return taskRepository.save(task);
+    };
 
     public void deleteTask(Long id) {
         Task task = taskRepository.findById(id)
@@ -81,5 +79,4 @@ public class TaskService {
         List<Task> completedTasks = taskRepository.findByCompletedTrue();
         taskRepository.deleteAll(completedTasks);
     }
-
 }
